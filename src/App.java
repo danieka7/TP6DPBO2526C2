@@ -26,6 +26,9 @@ public class App {
             logika.startGame();
         });
 
+        logika.setOnBackToMenu(() -> cardLayout.show(container, "menu"));
+
+
         container.add(menu, "menu");       // kartu pertama (tampil paling awal)
         container.add(tampilan, "game");   // kartu kedua
 

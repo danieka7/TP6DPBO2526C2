@@ -31,6 +31,12 @@ public class Logic implements ActionListener, KeyListener {
     Image birdImage;
     Player player;
 
+    // latar belakang
+    Image backgroundImage;
+    int backgroundPosX = 0;        // posisi X latar saat ini
+    int backgroundVelocityX = -1;  // kecepatan geser latar (lebih lambat dari pipa agar terkesan jauh)
+    int backgroundWidth;   // lebar latar setelah diskalakan
+
     // list pipa dan gambarnya
     Image lowerPipeImage;
     Image upperPipeImage;
@@ -40,6 +46,10 @@ public class Logic implements ActionListener, KeyListener {
     boolean gameOver = false;
     int score = 0;
 
+    Runnable onBackToMenu;
+
+
+    SoundPlayer bgm;
     // [BARU] efek suara saat burung melompat
     SoundPlayer jumpSound;
 
@@ -50,6 +60,7 @@ public class Logic implements ActionListener, KeyListener {
     SoundPlayer passSound;
 
     public Logic(){
+        backgroundImage = new ImageIcon(getClass().getResource("assets/flappy_bird_backdrop.jpg")).getImage();
         birdImage = new ImageIcon(getClass().getResource("assets/bird.png")).getImage();
         player = new Player(playerStartPosX, playerStartPosY, playerWidth, playerHeight, birdImage);
 
@@ -57,6 +68,9 @@ public class Logic implements ActionListener, KeyListener {
         upperPipeImage = new ImageIcon(getClass().getResource("assets/upperPipe.png")).getImage();
         pipes = new ArrayList<Pipe>();
 
+        backgroundWidth = backgroundImage.getWidth(null) * frameHeight / backgroundImage.getHeight(null);
+
+        bgm = new SoundPlayer("assets/sound/bgm.wav");
         // [BARU] muat file suara lompat sekali saja di awal (bukan setiap SPASI ditekan)
         jumpSound = new SoundPlayer("assets/sound/spongebob-boowomp.wav");
         // [BARU] muat suara game over sekali di awal juga
@@ -75,7 +89,7 @@ public class Logic implements ActionListener, KeyListener {
             }
         });
 
-        gameLoop = new Timer(1000/60, this); // 60 FPS, belum dijalankan
+        gameLoop = new Timer(1000/60, this); // 60 FPS
     }
 
     public void setView(View view){
@@ -90,9 +104,29 @@ public class Logic implements ActionListener, KeyListener {
         return pipes;
     }
 
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public int getBackgroundPosX(){
+        return backgroundPosX;
+    }
+
+    public int getBackgroundWidth() {
+        return backgroundWidth;
+    }
+
     // [BARU] getter agar View bisa tahu status game dan skor
     public boolean isGameOver(){
         return gameOver;
+    }
+
+    public void setOnBackToMenu(Runnable onBackToMenu) {
+        this.onBackToMenu = onBackToMenu;
+    }
+
+    public Runnable getOnBackToMenu() {
+        return onBackToMenu;
     }
 
     public int getScore(){
@@ -101,6 +135,8 @@ public class Logic implements ActionListener, KeyListener {
 
     // [BARU] dipanggil dari tombol "Mulai Main" di menu
     public void startGame(){
+        bgm.stop();
+        bgm.loop();
         resetGame();
     }
 
@@ -113,6 +149,7 @@ public class Logic implements ActionListener, KeyListener {
         pipes.clear();            // hapus semua pipa lama
         score = 0;
         gameOver = false;
+        backgroundPosX = 0;
 
         if(view != null){
             view.updateScore(score);
@@ -140,6 +177,11 @@ public class Logic implements ActionListener, KeyListener {
     }
 
     public void move(){
+        backgroundPosX += backgroundVelocityX;
+        if(backgroundPosX <= -backgroundWidth){
+            backgroundPosX += backgroundWidth;   // salinan pertama sudah keluar layar, kembalikan ke awal
+        }
+
         player.setVelocityY(player.getVelocityY() + gravity);
         player.setPosY(player.getPosY() + player.getVelocityY());
         player.setPosY(Math.max(player.getPosY(), 0)); // burung tidak bisa keluar dari batas atas
@@ -200,6 +242,7 @@ public class Logic implements ActionListener, KeyListener {
         // jika game over: hentikan kedua timer sehingga permainan berhenti total
         if(gameOver){
             gameLoop.stop();
+            bgm.stop();
             pipesCooldown.stop();
             gameOverSound.play(); // [BARU] bunyi sekali saat game over
             gameOverSound1.play(); // [BARU] bunyi sekali saat game over
@@ -230,8 +273,17 @@ public class Logic implements ActionListener, KeyListener {
         // R = restart, hanya berlaku saat sudah Game Over
         if(e.getKeyCode() == KeyEvent.VK_R && gameOver){
             resetGame();
+            bgm.loop();
             gameOverSound.stop();
             gameOverSound1.stop();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE && gameOver){
+            if (onBackToMenu != null){
+                onBackToMenu.run();
+                gameOverSound.stop();
+                gameOverSound1.stop();
+            }
         }
     }
 

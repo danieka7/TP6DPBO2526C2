@@ -42,6 +42,19 @@ public class View extends JPanel {
     }
 
     public void draw(Graphics g){
+        Image background = logic.getBackgroundImage();
+        if(background != null){
+            int bgX = logic.getBackgroundPosX();
+            int bgW = logic.getBackgroundWidth();
+
+            // lebar gambar setelah diskalakan ke tinggi panel, rasio asli tetap terjaga (± 851)
+//            int bgX = background.getWidth(null) * height / background.getHeight(null);
+//            int bgW = background.getWidth(null) * height / background.getHeight(null);
+
+            g.drawImage(background, bgX, 0, bgW, height, null);          // salinan pertama
+            g.drawImage(background, bgX + bgW, 0, bgW, height, null);
+        }
+
         // pipa digambar lebih dulu agar burung tampil di depan pipa
         ArrayList<Pipe> pipes = logic.getPipes();
         if(pipes != null){
@@ -65,6 +78,7 @@ public class View extends JPanel {
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 18));
             drawCenteredString(g, "Tekan R untuk restart", height / 2 + 20);
+            drawCenteredString(g, "Tekan Esc untuk kembali ke menu", height / 2 + 50);
         }
     }
 
