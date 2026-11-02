@@ -11,7 +11,6 @@ Pemain mengendalikan seekor burung yang harus melewati celah di antara pipa-pipa
 ```
 .
 ├── dokumentasi
-│   ├── design.png
 │   ├── menuUtama.png
 │   ├── permainan.png
 │   └── gameOver.png
