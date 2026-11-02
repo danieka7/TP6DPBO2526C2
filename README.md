@@ -211,8 +211,8 @@ Pemain mengendalikan seekor burung yang harus melewati celah di antara pipa-pipa
 ## Dokumentasi
 - ### Java Swing
     - #### Tampilan Menu Utama
-      ![menuUtama](<dokumentasi/menuUtama.png>)
+      ![menuUtama](<Dokumentasi/menuUtama.png>)
     - #### Tampilan Saat Bermain
-      ![permainan](<dokumentasi/permainan.png>)
+      ![permainan](<Dokumentasi/permainan.png>)
     - #### Tampilan Game Over
-      ![gameOver](<dokumentasi/gameOver.png>)
+      ![gameOver](<Dokumentasi/gameOver.png>)
